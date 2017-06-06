@@ -14,7 +14,6 @@ import (
 // Session for discord bot
 var (
 	discord *discordgo.Session
-	cmdList []Command
 	err     error
 	prefix  string
 )
