@@ -1,14 +1,17 @@
-package bauxebotdiscordcmd
+package cmd
 
 import "github.com/bwmarrin/discordgo"
 
-type commandColor struct {
-	response string
-	cooldown int
+// CommandColor represents a struct for changing name colors
+type CommandColor struct {
+	Caller   string
+	Response string
+	Cooldown int
 }
 
-func (c commandColor) execute(s *discordgo.Session, m *discordgo.MessageCreate) {
-	send := insertPlaceholders(c.response, m)
+// Execute reporesents acting upon the color command
+func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) {
+	send := insertPlaceholders(c.Response, m)
 
 	s.ChannelMessage(m.ChannelID, send)
 }

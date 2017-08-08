@@ -1,6 +1,7 @@
 package bauxebotdiscord
 
 import (
+	"container/list"
 	"fmt"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Chris-SG/BauxeBot_Go/discord/commands"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -16,6 +18,7 @@ var (
 	discord *discordgo.Session
 	err     error
 	prefix  string
+	cmdlist *list.List
 )
 
 /*type Command interface {
@@ -126,6 +129,10 @@ func init() {
 	discord, err = discordgo.New()
 
 	discord.Token = "Bot " + os.Getenv("DISCORD_BOT_TOKEN")
+	cmdlist = list.New()
+
+	cmdlist.PushBack(cmd.CommandDummy{Caller: "dummytest", Response: "test", Cooldown: 3})
+	cmdlist.PushBack(cmd.CommandColor{Caller: "colortest", Response: "test2", Cooldown: 3})
 }
 
 // StartBotDiscord will Start Discord bot

@@ -1,9 +1,10 @@
-package bauxebotdiscordcmd
+package cmd
 
 import "github.com/bwmarrin/discordgo"
 
-type command interface {
-	execute(s *discordgo.Session, m *discordgo.MessageCreate)
+// Command works as an interface for other commands
+type Command interface {
+	Execute(s *discordgo.Session, m *discordgo.MessageCreate)
 }
 
 func init() {

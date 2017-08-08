@@ -1,14 +1,17 @@
-package bauxebotdiscordcmd
+package cmd
 
 import "github.com/bwmarrin/discordgo"
 
-type commandDummy struct {
-	response string
-	cooldown int
+// CommandDummy represents a simple response message
+type CommandDummy struct {
+	Caller   string
+	Response string
+	Cooldown int
 }
 
-func (c commandDummy) execute(s *discordgo.Session, m *discordgo.MessageCreate) {
-	send := insertPlaceholders(c.response, m)
+// Execute acts upon a given message
+func (c CommandDummy) Execute(s *discordgo.Session, m *discordgo.MessageCreate) {
+	send := insertPlaceholders(c.Response, m)
 
 	s.ChannelMessage(m.ChannelID, send)
 }
