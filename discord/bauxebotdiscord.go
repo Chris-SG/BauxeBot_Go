@@ -131,8 +131,10 @@ func init() {
 	discord.Token = "Bot " + os.Getenv("DISCORD_BOT_TOKEN")
 	cmdlist = list.New()
 
-	cmdlist.PushBack(cmd.CommandDummy{Caller: "dummytest", Response: "test", Cooldown: 3})
-	cmdlist.PushBack(cmd.CommandColor{Caller: "colortest", Response: "test2", Cooldown: 3})
+	c := cmd.CommandColor{Cooldown: 3, Common: cmd.CommandCommon{Caller: "colortest", Response: "test2", Description: "Color test"}}
+	cmdlist.PushBack(c)
+	d := cmd.CommandDummy{Cooldown: 3, Common: cmd.CommandCommon{Caller: "dummytest", Response: "test1", Description: "Dummy test"}}
+	cmdlist.PushBack(d)
 }
 
 // StartBotDiscord will Start Discord bot
