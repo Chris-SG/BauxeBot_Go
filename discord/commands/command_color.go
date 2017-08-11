@@ -14,3 +14,7 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 
 	s.ChannelMessage(m.ChannelID, send)
 }
+
+func (c CommandColor) createRoleWithColor(s *discordgo.Session, server string, roleName string, color string) *discordgo.Role {
+
+}
