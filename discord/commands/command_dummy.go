@@ -1,6 +1,10 @@
 package cmd
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"log"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 // CommandDummy represents a simple response message
 type CommandDummy struct {
@@ -11,6 +15,7 @@ type CommandDummy struct {
 // Execute acts upon a given message
 func (c CommandDummy) Execute(s *discordgo.Session, m *discordgo.MessageCreate) {
 	send := insertPlaceholders(c.Common.Response, m)
+	log.Print("trying to send")
 
-	s.ChannelMessage(m.ChannelID, send)
+	s.ChannelMessageSend(m.ChannelID, send)
 }

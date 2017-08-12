@@ -10,8 +10,7 @@ import (
 
 // CommandColor represents a struct for changing name colors
 type CommandColor struct {
-	Cooldown int
-	Common   CommandCommon
+	Common CommandCommon
 }
 
 // Execute reporesents acting upon the color command
@@ -30,11 +29,8 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 			return
 		}
 		channel, _ := s.State.Channel(m.ChannelID)
-		log.Print("Step1")
 		c.createRoleWithColor(s, channel.GuildID, m.Author.ID, roleColor)
-		log.Print("Step2")
 		s.ChannelMessageSend(m.ChannelID, send)
-		log.Print("Step3")
 	} else {
 		log.Print("Can't execute")
 	}
@@ -50,10 +46,10 @@ func (c CommandColor) hexToInt(color string) (colorInt int, err error) {
 
 func (c CommandColor) createRoleWithColor(s *discordgo.Session, guildID string, roleName string, color int) *discordgo.Role {
 	guild, _ := s.State.Guild(guildID)
-	for _, roleList := range guild.Roles {
-		if roleList.Name == roleName {
-			s.GuildRoleEdit(guildID, roleList.ID, roleList.Name, color, false, 0, false)
-			return roleList
+	for _, roleFromList := range guild.Roles {
+		if roleFromList.Name == roleName {
+			s.GuildRoleEdit(guildID, roleFromList.ID, roleFromList.Name, color, false, 0, false)
+			return roleFromList
 		}
 	}
 
@@ -62,11 +58,19 @@ func (c CommandColor) createRoleWithColor(s *discordgo.Session, guildID string, 
 	s.GuildMemberRoleAdd(guildID, roleName, newRole.ID)
 	roleList := guild.Roles
 
-	for i := len(roleList) - 1; i > 3; i++ {
+	for _, roleFromList := range roleList {
+		log.Printf("Rolename: %s", roleFromList.Name)
+	}
+
+	for i := len(roleList) - 1; i > 3; i-- {
 		roleList[i] = roleList[i-1]
 	}
 	roleList[3] = newRole
 	s.GuildRoleReorder(guildID, roleList)
+
+	for _, roleFromList := range roleList {
+		log.Printf("Rolename: %s", roleFromList.Name)
+	}
 
 	return newRole
 }

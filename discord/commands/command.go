@@ -7,6 +7,12 @@ type Command interface {
 	Execute(s *discordgo.Session, m *discordgo.MessageCreate)
 }
 
+// Commands is a struct to hold all bot commands by type
+type Commands struct {
+	DummyCommands []CommandDummy
+	ColorCommands []CommandColor
+}
+
 /*CommandCommon represents fields common between all commands
 
  Fields are as follows:
