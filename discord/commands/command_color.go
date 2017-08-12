@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log"
 	"strconv"
 	"strings"
 
@@ -16,6 +17,7 @@ type CommandColor struct {
 // Execute reporesents acting upon the color command
 func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) {
 	send := insertPlaceholders(c.Common.Response, m)
+	log.Printf("Trying to set color %s", m.Content)
 	if c.Common.canExecute(s, m) {
 		parts := strings.Split(m.Content, " ")
 		if len(parts) < 2 || len(parts[1]) != 6 {
@@ -28,8 +30,13 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 			return
 		}
 		channel, _ := s.State.Channel(m.ChannelID)
+		log.Print("Step1")
 		c.createRoleWithColor(s, channel.GuildID, m.Author.ID, roleColor)
-		s.ChannelMessage(m.ChannelID, send)
+		log.Print("Step2")
+		s.ChannelMessageSend(m.ChannelID, send)
+		log.Print("Step3")
+	} else {
+		log.Print("Can't execute")
 	}
 
 	return

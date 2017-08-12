@@ -12,6 +12,9 @@ func replace(s string, m *discordgo.MessageCreate) (res string) {
 		res = m.Author.Username
 	case "ID":
 		res = m.Author.ID
+	case "ARG1":
+		parts := strings.Split(m.Content, " ")
+		res = parts[1]
 	default:
 		res = "{" + s + "}"
 	}

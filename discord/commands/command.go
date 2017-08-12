@@ -1,10 +1,6 @@
 package cmd
 
-import (
-	"container/list"
-
-	"github.com/bwmarrin/discordgo"
-)
+import "github.com/bwmarrin/discordgo"
 
 // Command works as an interface for other commands
 type Command interface {
@@ -34,9 +30,9 @@ type CommandCommon struct {
 	Response            string
 	Description         string
 	Structure           string
-	Channels            *list.List
+	Channels            []string
 	RequiredPermissions int
-	RequiredUsers       *list.List
+	RequiredUsers       []string
 }
 
 const (
@@ -84,7 +80,7 @@ func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCrea
 }
 
 func (c CommandCommon) sendErrorResponse(s *discordgo.Session, channelID string) {
-	response := "Must use corrent format: " + c.Structure
+	response := "Must use correct format: " + c.Structure
 	s.ChannelMessageSend(channelID, response)
 	return
 }
@@ -98,33 +94,33 @@ func CheckPerm(userPerms int, perm int) bool {
 }
 
 func checkOtherPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<createInstantInvite) != 0 {
-		if commandPerms&(1<<createInstantInvite) == 0 {
+	if userPerms&(1<<createInstantInvite) == 0 {
+		if commandPerms&(1<<createInstantInvite) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<kickMembers) != 0 {
-		if commandPerms&(1<<kickMembers) == 0 {
+	if userPerms&(1<<kickMembers) == 0 {
+		if commandPerms&(1<<kickMembers) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<banMembers) != 0 {
-		if commandPerms&(1<<banMembers) == 0 {
+	if userPerms&(1<<banMembers) == 0 {
+		if commandPerms&(1<<banMembers) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<administrator) != 0 {
-		if commandPerms&(1<<administrator) == 0 {
+	if userPerms&(1<<administrator) == 0 {
+		if commandPerms&(1<<administrator) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<viewAuditLog) != 0 {
-		if commandPerms&(1<<viewAuditLog) == 0 {
+	if userPerms&(1<<viewAuditLog) == 0 {
+		if commandPerms&(1<<viewAuditLog) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<changeNickname) != 0 {
-		if commandPerms&(1<<changeNickname) == 0 {
+	if userPerms&(1<<changeNickname) == 0 {
+		if commandPerms&(1<<changeNickname) != 0 {
 			return false
 		}
 	}
@@ -133,38 +129,38 @@ func checkOtherPerms(userPerms int, commandPerms int) bool {
 }
 
 func checkManagementPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<manageChannels) != 0 {
-		if commandPerms&(1<<manageChannels) == 0 {
+	if userPerms&(1<<manageChannels) == 0 {
+		if commandPerms&(1<<manageChannels) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageEmojis) != 0 {
-		if commandPerms&(1<<manageEmojis) == 0 {
+	if userPerms&(1<<manageEmojis) == 0 {
+		if commandPerms&(1<<manageEmojis) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageGuild) != 0 {
-		if commandPerms&(1<<manageGuild) == 0 {
+	if userPerms&(1<<manageGuild) == 0 {
+		if commandPerms&(1<<manageGuild) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageMessages) != 0 {
-		if commandPerms&(1<<manageMessages) == 0 {
+	if userPerms&(1<<manageMessages) == 0 {
+		if commandPerms&(1<<manageMessages) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageNicknames) != 0 {
-		if commandPerms&(1<<manageNicknames) == 0 {
+	if userPerms&(1<<manageNicknames) == 0 {
+		if commandPerms&(1<<manageNicknames) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageRoles) != 0 {
-		if commandPerms&(1<<manageRoles) == 0 {
+	if userPerms&(1<<manageRoles) == 0 {
+		if commandPerms&(1<<manageRoles) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageWebhooks) != 0 {
-		if commandPerms&(1<<manageWebhooks) == 0 {
+	if userPerms&(1<<manageWebhooks) == 0 {
+		if commandPerms&(1<<manageWebhooks) != 0 {
 			return false
 		}
 	}
@@ -173,53 +169,53 @@ func checkManagementPerms(userPerms int, commandPerms int) bool {
 }
 
 func checkTextPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<addReactions) != 0 {
-		if commandPerms&(1<<addReactions) == 0 {
+	if userPerms&(1<<addReactions) == 0 {
+		if commandPerms&(1<<addReactions) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<readMessages) != 0 {
-		if commandPerms&(1<<readMessages) == 0 {
+	if userPerms&(1<<readMessages) == 0 {
+		if commandPerms&(1<<readMessages) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<sendMessages) != 0 {
-		if commandPerms&(1<<sendMessages) == 0 {
+	if userPerms&(1<<sendMessages) == 0 {
+		if commandPerms&(1<<sendMessages) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<sendTTSMessages) != 0 {
-		if commandPerms&(1<<sendTTSMessages) == 0 {
+	if userPerms&(1<<sendTTSMessages) == 0 {
+		if commandPerms&(1<<sendTTSMessages) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageMessages) != 0 {
-		if commandPerms&(1<<manageMessages) == 0 {
+	if userPerms&(1<<manageMessages) == 0 {
+		if commandPerms&(1<<manageMessages) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<embedLinks) != 0 {
-		if commandPerms&(1<<embedLinks) == 0 {
+	if userPerms&(1<<embedLinks) == 0 {
+		if commandPerms&(1<<embedLinks) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<attachFiles) != 0 {
-		if commandPerms&(1<<attachFiles) == 0 {
+	if userPerms&(1<<attachFiles) == 0 {
+		if commandPerms&(1<<attachFiles) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<readMessageHistory) != 0 {
-		if commandPerms&(1<<readMessageHistory) == 0 {
+	if userPerms&(1<<readMessageHistory) == 0 {
+		if commandPerms&(1<<readMessageHistory) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<mentionEveryone) != 0 {
-		if commandPerms&(1<<mentionEveryone) == 0 {
+	if userPerms&(1<<mentionEveryone) == 0 {
+		if commandPerms&(1<<mentionEveryone) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<useExternalEmojis) != 0 {
-		if commandPerms&(1<<useExternalEmojis) == 0 {
+	if userPerms&(1<<useExternalEmojis) == 0 {
+		if commandPerms&(1<<useExternalEmojis) != 0 {
 			return false
 		}
 	}
@@ -228,33 +224,33 @@ func checkTextPerms(userPerms int, commandPerms int) bool {
 }
 
 func checkVoicePerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<connect) != 0 {
-		if commandPerms&(1<<connect) == 0 {
+	if userPerms&(1<<connect) == 0 {
+		if commandPerms&(1<<connect) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<speak) != 0 {
-		if commandPerms&(1<<speak) == 0 {
+	if userPerms&(1<<speak) == 0 {
+		if commandPerms&(1<<speak) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<muteMembers) != 0 {
-		if commandPerms&(1<<muteMembers) == 0 {
+	if userPerms&(1<<muteMembers) == 0 {
+		if commandPerms&(1<<muteMembers) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<deafenMembers) != 0 {
-		if commandPerms&(1<<deafenMembers) == 0 {
+	if userPerms&(1<<deafenMembers) == 0 {
+		if commandPerms&(1<<deafenMembers) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<moveMembers) != 0 {
-		if commandPerms&(1<<moveMembers) == 0 {
+	if userPerms&(1<<moveMembers) == 0 {
+		if commandPerms&(1<<moveMembers) != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<useVAD) != 0 {
-		if commandPerms&(1<<useVAD) == 0 {
+	if userPerms&(1<<useVAD) == 0 {
+		if commandPerms&(1<<useVAD) != 0 {
 			return false
 		}
 	}

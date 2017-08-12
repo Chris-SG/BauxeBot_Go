@@ -1,7 +1,6 @@
 package bauxebotdiscord
 
 import (
-	"container/list"
 	"fmt"
 	"log"
 	"os"
@@ -18,7 +17,7 @@ var (
 	discord *discordgo.Session
 	err     error
 	prefix  string
-	cmdlist *list.List
+	cmdList []cmd.CommandColor
 )
 
 /*type Command interface {
@@ -58,7 +57,7 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	if channel.Name != "colour_requests" {
+	/*if channel.Name != "colour_requests" {
 		if m.Content[0] == '!' {
 			log.Printf("%s : %s", channel.ID, m.Content)
 			var msg, merr = s.ChannelMessageSend(channel.ID, "helo")
@@ -67,6 +66,12 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			} else {
 				log.Printf("Wrote: %s", msg.Content)
 			}
+		}
+	}*/
+
+	for _, cmd := range cmdList {
+		if strings.HasPrefix(m.Content, (prefix + cmd.Common.Caller)) {
+			cmd.Execute(s, m)
 		}
 	}
 }
@@ -129,12 +134,11 @@ func init() {
 	discord, err = discordgo.New()
 
 	discord.Token = "Bot " + os.Getenv("DISCORD_BOT_TOKEN")
-	cmdlist = list.New()
 
-	c := cmd.CommandColor{Cooldown: 3, Common: cmd.CommandCommon{Caller: "colortest", Response: "test2", Description: "Color test"}}
-	cmdlist.PushBack(c)
-	d := cmd.CommandDummy{Cooldown: 3, Common: cmd.CommandCommon{Caller: "dummytest", Response: "test1", Description: "Dummy test"}}
-	cmdlist.PushBack(d)
+	channels := []string{}
+	users := []string{}
+	c := cmd.CommandColor{Cooldown: 0, Common: cmd.CommandCommon{Caller: "setcolor", Response: "Setting {NAME}'s color to {ARG1}.", Description: "Sets user's color", Structure: "!setcolor <color> (hex)", Channels: channels, RequiredPermissions: 0, RequiredUsers: users}}
+	cmdList = append(cmdList, c)
 }
 
 // StartBotDiscord will Start Discord bot
