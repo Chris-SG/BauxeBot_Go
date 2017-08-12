@@ -15,11 +15,17 @@ type CommandColor struct {
 
 // Execute reporesents acting upon the color command
 func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// Replace any placeholder text ({})
 	send := insertPlaceholders(c.Common.Response, m)
 	log.Printf("Trying to set color %s", m.Content)
+	// Check if user has correct permissions
 	if c.Common.canExecute(s, m) {
+		// Check if user sent 6 characters (hex representation)
 		parts := strings.Split(m.Content, " ")
 		if len(parts) < 2 || len(parts[1]) != 6 {
+			if len(parts[1]) == 7 && parts[1][0] == '#' {
+				parts[1] = strings.TrimPrefix(parts[1], "#")
+			}
 			c.Common.sendErrorResponse(s, m.ChannelID)
 			return
 		}
@@ -31,6 +37,7 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 		channel, _ := s.State.Channel(m.ChannelID)
 		c.createRoleWithColor(s, channel.GuildID, m.Author.ID, roleColor)
 		s.ChannelMessageSend(m.ChannelID, send)
+		log.Print("Done")
 	} else {
 		log.Print("Can't execute")
 	}

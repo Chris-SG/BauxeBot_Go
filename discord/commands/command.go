@@ -41,6 +41,7 @@ type CommandCommon struct {
 	RequiredUsers       []string
 }
 
+// all permissions
 const (
 	createInstantInvite = iota //other
 	kickMembers         = iota //other
@@ -72,9 +73,16 @@ const (
 	manageEmojis        = iota //manage
 )
 
+// Check if a user can execute a command
 func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	userPerms, _ := s.UserChannelPermissions(m.Author.ID, m.ChannelID)
 
+	// Most commands won't have tied permissions, so this speeds most up
+	if c.RequiredPermissions == 0 && len(c.RequiredUsers) == 0 {
+		return true
+	}
+
+	// This is pretty much untested. Need to add check for required users
 	if !checkVoicePerms(userPerms, c.RequiredPermissions) ||
 		!checkTextPerms(userPerms, c.RequiredPermissions) ||
 		!checkManagementPerms(userPerms, c.RequiredPermissions) ||
@@ -85,6 +93,7 @@ func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCrea
 	return true
 }
 
+// Send error
 func (c CommandCommon) sendErrorResponse(s *discordgo.Session, channelID string) {
 	response := "Must use correct format: " + c.Structure
 	s.ChannelMessageSend(channelID, response)
