@@ -83,6 +83,12 @@ func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCrea
 	return true
 }
 
+func (c CommandCommon) sendErrorResponse(s *discordgo.Session, channelID string) {
+	response := "Must use corrent format: " + c.Structure
+	s.ChannelMessageSend(channelID, response)
+	return
+}
+
 // CheckPerm checks if a user has a specified permission
 func CheckPerm(userPerms int, perm int) bool {
 	if userPerms&(1<<uint(perm)) != 0 {
