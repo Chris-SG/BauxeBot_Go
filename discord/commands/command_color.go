@@ -60,23 +60,19 @@ func (c CommandColor) createRoleWithColor(s *discordgo.Session, guildID string, 
 		}
 	}
 
-	newRole, _ := s.GuildRoleCreate(guildID)
-	s.GuildRoleEdit(guildID, newRole.ID, roleName, color, false, 0, false)
-	s.GuildMemberRoleAdd(guildID, roleName, newRole.ID)
 	roleList := guild.Roles
+	newRole, _ := s.GuildRoleCreate(guildID)
+	newRole, _ = s.GuildRoleEdit(guildID, newRole.ID, roleName, color, false, 0, false)
+	s.GuildMemberRoleAdd(guildID, roleName, newRole.ID)
+	roleList = append(roleList, newRole)
+	newRole.Position = len(roleList)
 
-	for _, roleFromList := range roleList {
-		log.Printf("Rolename: %s", roleFromList.Name)
-	}
+	orderRolesByPositon(roleList)
 
-	for i := len(roleList) - 1; i > 3; i-- {
-		roleList[i] = roleList[i-1]
-	}
-	roleList[3] = newRole
 	s.GuildRoleReorder(guildID, roleList)
 
 	for _, roleFromList := range roleList {
-		log.Printf("Rolename: %s", roleFromList.Name)
+		log.Printf("Rolename: %s, Position: %d", roleFromList.Name, roleFromList.Position)
 	}
 
 	return newRole

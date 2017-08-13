@@ -11,6 +11,7 @@ type Command interface {
 type Commands struct {
 	DummyCommands []CommandDummy
 	ColorCommands []CommandColor
+	DebugCommands []CommandDebug
 }
 
 /*CommandCommon represents fields common between all commands

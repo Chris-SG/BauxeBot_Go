@@ -44,6 +44,14 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	}
+
+	// Check all debug commands
+	for _, debugCmd := range cmdList.DebugCommands {
+		if strings.HasPrefix(m.Content, (prefix + debugCmd.Common.Caller)) {
+			go debugCmd.Execute(s, m)
+			return
+		}
+	}
 }
 
 func onReady(s *discordgo.Session, event *discordgo.Ready) {
@@ -65,6 +73,8 @@ func init() {
 	cmdList.ColorCommands = append(cmdList.ColorCommands, c.(cmd.CommandColor))
 	c = cmd.CommandDummy{Common: cmd.CommandCommon{Caller: "helo", Response: "helo", Description: "helo", Structure: "!helo", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
 	cmdList.DummyCommands = append(cmdList.DummyCommands, c.(cmd.CommandDummy))
+	c = cmd.CommandDebug{Common: cmd.CommandCommon{Caller: "debug", Response: "", Description: "debug", Structure: "!debug <param>", Channels: []string{}, RequiredPermissions: 8, RequiredUsers: []string{}}}
+	cmdList.DebugCommands = append(cmdList.DebugCommands, c.(cmd.CommandDebug))
 }
 
 // StartBotDiscord will Start Discord bot
