@@ -9,9 +9,10 @@ type Command interface {
 
 // Commands is a struct to hold all bot commands by type
 type Commands struct {
-	DummyCommands []CommandDummy
-	ColorCommands []CommandColor
-	DebugCommands []CommandDebug
+	DummyCommands      []CommandDummy
+	ColorCommands      []CommandColor
+	DebugCommands      []CommandDebug
+	ModerationCommands []CommandModeration
 }
 
 /*CommandCommon represents fields common between all commands
@@ -37,6 +38,7 @@ type CommandCommon struct {
 	Response            string
 	Description         string
 	Structure           string
+	Action              string
 	Channels            []string
 	RequiredPermissions int
 	RequiredUsers       []string

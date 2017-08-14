@@ -52,6 +52,13 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 	}
+
+	// Check all moderation commands
+	for _, moderationCmd := range cmdList.ModerationCommands {
+		if strings.HasPrefix(m.Content, (prefix + moderationCmd.Common.Caller)) {
+			go moderationCmd.Execute(s, m)
+		}
+	}
 }
 
 func onReady(s *discordgo.Session, event *discordgo.Ready) {
@@ -69,12 +76,16 @@ func init() {
 
 	// Test commands, will make more elegant in time
 	var c cmd.Command
-	c = cmd.CommandColor{Common: cmd.CommandCommon{Caller: "color", Response: "Setting {HL_NAME}'s color to #{ARG1}.", Description: "Sets user's color", Structure: "!setcolor <color> (hex)", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
+	c = cmd.CommandColor{Common: cmd.CommandCommon{Caller: "color", Response: "Setting {HL_NAME}'s color to #{ARG1}.", Description: "Sets user's color", Structure: "!setcolor <color> (hex)", Action: "setcolor", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
+	cmdList.ColorCommands = append(cmdList.ColorCommands, c.(cmd.CommandColor))
+	c = cmd.CommandColor{Common: cmd.CommandCommon{Caller: "removecolor", Response: "Removing color from {HL_NAME}", Description: "Remove user's color", Structure: "!removecolor", Action: "removecolor", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
 	cmdList.ColorCommands = append(cmdList.ColorCommands, c.(cmd.CommandColor))
 	c = cmd.CommandDummy{Common: cmd.CommandCommon{Caller: "helo", Response: "helo", Description: "helo", Structure: "!helo", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
 	cmdList.DummyCommands = append(cmdList.DummyCommands, c.(cmd.CommandDummy))
-	c = cmd.CommandDebug{Common: cmd.CommandCommon{Caller: "debug", Response: "", Description: "debug", Structure: "!debug <param>", Channels: []string{}, RequiredPermissions: 8, RequiredUsers: []string{}}}
+	c = cmd.CommandDebug{Common: cmd.CommandCommon{Caller: "debug", Response: "", Description: "debug", Structure: "!debug <param>", Action: "debug", Channels: []string{}, RequiredPermissions: 8, RequiredUsers: []string{}}}
 	cmdList.DebugCommands = append(cmdList.DebugCommands, c.(cmd.CommandDebug))
+	c = cmd.CommandModeration{Common: cmd.CommandCommon{Caller: "delete", Response: "", Description: "Deletes specified message amount", Structure: "!delete <count>", Action: "deletebulk", Channels: []string{}, RequiredPermissions: 8192, RequiredUsers: []string{}}}
+	cmdList.ModerationCommands = append(cmdList.ModerationCommands, c.(cmd.CommandModeration))
 }
 
 // StartBotDiscord will Start Discord bot
