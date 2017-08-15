@@ -1,6 +1,10 @@
 package cmd
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"errors"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 // This file will be used for actions that may be required by all commands
 // This will include:
@@ -20,4 +24,33 @@ func orderRolesByPositon(r discordgo.Roles) {
 			}
 		}
 	}
+}
+
+func findCommandByName(cmds Commands, name string) (c Command, err error) {
+	for _, colorCommand := range cmds.ColorCommands {
+		if colorCommand.Common.Caller == name {
+			c = colorCommand
+			return
+		}
+	}
+	for _, dummyCommand := range cmds.DummyCommands {
+		if dummyCommand.Common.Caller == name {
+			c = dummyCommand
+			return
+		}
+	}
+	for _, debugCommand := range cmds.DebugCommands {
+		if debugCommand.Common.Caller == name {
+			c = debugCommand
+			return
+		}
+	}
+	for _, modCommand := range cmds.ModerationCommands {
+		if modCommand.Common.Caller == name {
+			c = modCommand
+			return
+		}
+	}
+	err = errors.New("Cannot find command")
+	return
 }
