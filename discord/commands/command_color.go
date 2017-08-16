@@ -63,6 +63,7 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 	return
 }
 
+// GetCommons gets the common struct for the command
 func (c CommandColor) GetCommons() CommandCommon {
 	return c.Common
 }

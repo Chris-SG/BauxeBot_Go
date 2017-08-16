@@ -83,7 +83,7 @@ func init() {
 	cmdList.ColorCommands = append(cmdList.ColorCommands, c.(cmd.CommandColor))
 	c = cmd.CommandDummy{Common: cmd.CommandCommon{Caller: "helo", Response: "helo", Description: "helo", Structure: "!helo", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
 	cmdList.DummyCommands = append(cmdList.DummyCommands, c.(cmd.CommandDummy))
-	c = cmd.CommandDebug{Common: cmd.CommandCommon{Caller: "debug", Response: "", Description: "debug", Structure: "!debug <param>", Action: "debug", Channels: []string{}, RequiredPermissions: 8, RequiredUsers: []string{}}}
+	c = cmd.CommandDebug{Common: cmd.CommandCommon{Caller: "debug", Response: "", Description: "debug", Structure: "!debug <param>", Action: "debug", Channels: []string{}, RequiredPermissions: 2146958591, RequiredUsers: []string{}}}
 	cmdList.DebugCommands = append(cmdList.DebugCommands, c.(cmd.CommandDebug))
 	c = cmd.CommandModeration{Common: cmd.CommandCommon{Caller: "delete", Response: "", Description: "Deletes specified message amount", Structure: "!delete <count>", Action: "deletebulk", Channels: []string{}, RequiredPermissions: 8192, RequiredUsers: []string{}}}
 	cmdList.ModerationCommands = append(cmdList.ModerationCommands, c.(cmd.CommandModeration))

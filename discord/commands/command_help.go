@@ -7,10 +7,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// CommandHelp represents a help command
 type CommandHelp struct {
 	Common CommandCommon
 }
 
+// Execute acts upon a given message
 func (c CommandHelp) Execute(s *discordgo.Session, m *discordgo.MessageCreate, cmds Commands) {
 	delimiter := string(m.Content[0])
 	params := strings.Split(m.Content, " ")
@@ -40,6 +42,7 @@ func (c CommandHelp) Execute(s *discordgo.Session, m *discordgo.MessageCreate, c
 	}
 }
 
+// GetCommons gets the common struct for the command
 func (c CommandHelp) GetCommons() CommandCommon {
 	return c.Common
 }

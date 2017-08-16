@@ -75,6 +75,7 @@ func (c CommandDebug) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 	return
 }
 
+// GetCommons gets the common struct for the command
 func (c CommandDebug) GetCommons() CommandCommon {
 	return c.Common
 }

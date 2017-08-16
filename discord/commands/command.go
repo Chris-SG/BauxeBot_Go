@@ -16,7 +16,8 @@ type Commands struct {
 	ModerationCommands []CommandModeration
 }
 
-var CmdList *Commands
+// CmdList is the list of commands
+var CmdList *Commands = &Commands{}
 
 /*CommandCommon represents fields common between all commands
 
@@ -59,26 +60,30 @@ const (
 	manageGuild                                //manage
 	addReactions                               //text
 	viewAuditLog                               //other
-	readMessages                               //text
-	sendMessages                               //text
-	sendTTSMessages                            //text
-	manageMessages                             //text
-	embedLinks                                 //text
-	attachFiles                                //text
-	readMessageHistory                         //text
-	mentionEveryone                            //text
-	useExternalEmojis                          //text
-	connect                                    //voice
-	speak                                      //voice
-	muteMembers                                //voice
-	deafenMembers                              //voice
-	moveMembers                                //voice
-	useVAD                                     //voice
-	changeNickname                             //other
-	manageNicknames                            //manage
-	manageRoles                                //manage
-	manageWebhooks                             //manage
-	manageEmojis                               //manage
+	none1
+	none2
+	readMessages       //text
+	sendMessages       //text
+	sendTTSMessages    //text
+	manageMessages     //text
+	embedLinks         //text
+	attachFiles        //text
+	readMessageHistory //text
+	mentionEveryone    //text
+	useExternalEmojis  //text
+	none3
+	connect         //voice
+	speak           //voice
+	muteMembers     //voice
+	deafenMembers   //voice
+	moveMembers     //voice
+	useVAD          //voice
+	changeNickname  //other
+	manageNicknames //manage
+	manageRoles     //manage
+	manageWebhooks  //manage
+	manageEmojis    //manage
+	none4
 )
 
 var permissionMap = map[Permission]string{
@@ -135,10 +140,10 @@ func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCrea
 	return true
 }
 
-func getRequiredPermissionNames(permissions int) (perms *[]string) {
+func getRequiredPermissionNames(permissions int) (perms []string) {
 	for val, name := range permissionMap {
 		if val&Permission(permissions) != 0 {
-			*perms = append(*perms, name)
+			perms = append(perms, name)
 		}
 	}
 	return

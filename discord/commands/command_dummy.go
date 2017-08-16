@@ -20,6 +20,7 @@ func (c CommandDummy) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 	s.ChannelMessageSend(m.ChannelID, send)
 }
 
+// GetCommons gets the common struct for the command
 func (c CommandDummy) GetCommons() CommandCommon {
 	return c.Common
 }
