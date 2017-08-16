@@ -19,3 +19,7 @@ func (c CommandDummy) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 
 	s.ChannelMessageSend(m.ChannelID, send)
 }
+
+func (c CommandDummy) GetCommons() CommandCommon {
+	return c.Common
+}

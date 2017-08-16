@@ -39,3 +39,7 @@ func (c CommandModeration) Execute(s *discordgo.Session, m *discordgo.MessageCre
 		s.ChannelMessagesBulkDelete(m.ChannelID, messagesToDelete)
 	}
 }
+
+func (c CommandModeration) GetCommons() CommandCommon {
+	return c.Common
+}

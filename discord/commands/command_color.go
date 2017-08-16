@@ -63,6 +63,10 @@ func (c CommandColor) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 	return
 }
 
+func (c CommandColor) GetCommons() CommandCommon {
+	return c.Common
+}
+
 func (c CommandColor) hexToInt(color string) (colorInt int, err error) {
 	tmpColor, _ := strconv.ParseInt(color, 16, 32)
 	colorInt = int(tmpColor)

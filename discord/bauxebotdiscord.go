@@ -15,7 +15,7 @@ var (
 	discord *discordgo.Session
 	err     error
 	prefix  string
-	cmdList cmd.Commands
+	cmdList *cmd.Commands
 	bot     *discordgo.User
 )
 
@@ -75,6 +75,7 @@ func init() {
 	discord.Token = "Bot " + os.Getenv("DISCORD_BOT_TOKEN")
 
 	// Test commands, will make more elegant in time
+	cmdList = cmd.CmdList
 	var c cmd.Command
 	c = cmd.CommandColor{Common: cmd.CommandCommon{Caller: "color", Response: "Setting {HL_NAME}'s color to #{ARG1}.", Description: "Sets user's color", Structure: "!setcolor <color> (hex)", Action: "setcolor", Channels: []string{}, RequiredPermissions: 0, RequiredUsers: []string{}}}
 	cmdList.ColorCommands = append(cmdList.ColorCommands, c.(cmd.CommandColor))

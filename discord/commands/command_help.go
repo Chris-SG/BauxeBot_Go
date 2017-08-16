@@ -31,10 +31,15 @@ func (c CommandHelp) Execute(s *discordgo.Session, m *discordgo.MessageCreate, c
 					var embed *discordgo.MessageEmbed
 					embed.Author.Name = bot.Username
 					embed.Author.IconURL = bot.Avatar
+					log.Printf("%s", cmdHelp.GetCommons().Caller)
 
 				}
 			}
 			return
 		}
 	}
+}
+
+func (c CommandHelp) GetCommons() CommandCommon {
+	return c.Common
 }

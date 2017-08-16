@@ -60,7 +60,21 @@ func (c CommandDebug) Execute(s *discordgo.Session, m *discordgo.MessageCreate) 
 			}
 		}
 		log.Printf("Could not find role")
+	case "checkperms":
+		if len(params) < 3 {
+			return
+		}
+		c, err := findCommandByName(*CmdList, params[2])
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		} else {
+			log.Printf("perms: %v", getRequiredPermissionNames(c.GetCommons().RequiredPermissions))
+		}
 	}
 
 	return
+}
+
+func (c CommandDebug) GetCommons() CommandCommon {
+	return c.Common
 }

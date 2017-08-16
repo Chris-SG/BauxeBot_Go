@@ -5,6 +5,7 @@ import "github.com/bwmarrin/discordgo"
 // Command works as an interface for other commands
 type Command interface {
 	Execute(s *discordgo.Session, m *discordgo.MessageCreate)
+	GetCommons() CommandCommon
 }
 
 // Commands is a struct to hold all bot commands by type
@@ -14,6 +15,8 @@ type Commands struct {
 	DebugCommands      []CommandDebug
 	ModerationCommands []CommandModeration
 }
+
+var CmdList *Commands
 
 /*CommandCommon represents fields common between all commands
 
@@ -44,37 +47,70 @@ type CommandCommon struct {
 	RequiredUsers       []string
 }
 
+type Permission int
+
 // all permissions
 const (
-	createInstantInvite = iota //other
-	kickMembers         = iota //other
-	banMembers          = iota //other
-	administrator       = iota //other
-	manageChannels      = iota //manage
-	manageGuild         = iota //manage
-	addReactions        = iota //text
-	viewAuditLog        = iota //other
-	readMessages        = iota //text
-	sendMessages        = iota //text
-	sendTTSMessages     = iota //text
-	manageMessages      = iota //text
-	embedLinks          = iota //text
-	attachFiles         = iota //text
-	readMessageHistory  = iota //text
-	mentionEveryone     = iota //text
-	useExternalEmojis   = iota //text
-	connect             = iota //voice
-	speak               = iota //voice
-	muteMembers         = iota //voice
-	deafenMembers       = iota //voice
-	moveMembers         = iota //voice
-	useVAD              = iota //voice
-	changeNickname      = iota //other
-	manageNicknames     = iota //manage
-	manageRoles         = iota //manage
-	manageWebhooks      = iota //manage
-	manageEmojis        = iota //manage
+	createInstantInvite Permission = 1 << iota //other
+	kickMembers                                //other
+	banMembers                                 //other
+	administrator                              //other
+	manageChannels                             //manage
+	manageGuild                                //manage
+	addReactions                               //text
+	viewAuditLog                               //other
+	readMessages                               //text
+	sendMessages                               //text
+	sendTTSMessages                            //text
+	manageMessages                             //text
+	embedLinks                                 //text
+	attachFiles                                //text
+	readMessageHistory                         //text
+	mentionEveryone                            //text
+	useExternalEmojis                          //text
+	connect                                    //voice
+	speak                                      //voice
+	muteMembers                                //voice
+	deafenMembers                              //voice
+	moveMembers                                //voice
+	useVAD                                     //voice
+	changeNickname                             //other
+	manageNicknames                            //manage
+	manageRoles                                //manage
+	manageWebhooks                             //manage
+	manageEmojis                               //manage
 )
+
+var permissionMap = map[Permission]string{
+	createInstantInvite: "CreateInstantInvite",
+	kickMembers:         "KickMembers",
+	banMembers:          "BanMembers",
+	administrator:       "Administrator",
+	manageChannels:      "ManageChannels",
+	manageGuild:         "ManageGuild",
+	addReactions:        "AddReactions",
+	viewAuditLog:        "ViewAuditLog",
+	readMessages:        "ReadMessages",
+	sendMessages:        "SendMessages",
+	sendTTSMessages:     "SendTTSMessages",
+	manageMessages:      "ManageMessages",
+	embedLinks:          "EmbedLinks",
+	attachFiles:         "AttachFiles",
+	readMessageHistory:  "ReadMessageHistory",
+	mentionEveryone:     "MentionEveryone",
+	useExternalEmojis:   "UseExternalEmojis",
+	connect:             "Connect",
+	speak:               "Speak",
+	muteMembers:         "MuteMembers",
+	deafenMembers:       "DeafenMembers",
+	moveMembers:         "MoveMembers",
+	useVAD:              "UseVAD",
+	changeNickname:      "ChangeNickname",
+	manageNicknames:     "ManageNicknames",
+	manageRoles:         "ManageRoles",
+	manageWebhooks:      "ManageWebhooks",
+	manageEmojis:        "ManageEmojis",
+}
 
 // Check if a user can execute a command
 func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCreate) bool {
@@ -86,14 +122,26 @@ func (c CommandCommon) canExecute(s *discordgo.Session, m *discordgo.MessageCrea
 	}
 
 	// This is pretty much untested. Need to add check for required users
-	if !checkVoicePerms(userPerms, c.RequiredPermissions) ||
+	/*if !checkVoicePerms(userPerms, c.RequiredPermissions) ||
 		!checkTextPerms(userPerms, c.RequiredPermissions) ||
 		!checkManagementPerms(userPerms, c.RequiredPermissions) ||
 		!checkOtherPerms(userPerms, c.RequiredPermissions) {
 		return false
+	}*/
+	if userPerms&c.RequiredPermissions != c.RequiredPermissions {
+		return false
 	}
 
 	return true
+}
+
+func getRequiredPermissionNames(permissions int) (perms *[]string) {
+	for val, name := range permissionMap {
+		if val&Permission(permissions) != 0 {
+			*perms = append(*perms, name)
+		}
+	}
+	return
 }
 
 // Send error
@@ -105,80 +153,40 @@ func (c CommandCommon) sendErrorResponse(s *discordgo.Session, channelID string)
 
 // CheckPerm checks if a user has a specified permission
 func CheckPerm(userPerms int, perm int) bool {
-	if userPerms&(1<<uint(perm)) != 0 {
+	if userPerms&(perm) != 0 {
 		return true
 	}
 	return false
 }
 
-func checkOtherPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<createInstantInvite) == 0 {
-		if commandPerms&(1<<createInstantInvite) != 0 {
+func checkOtherPerms(userPerms Permission, commandPerms Permission) bool {
+	if userPerms&createInstantInvite == 0 {
+		if commandPerms&createInstantInvite != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<kickMembers) == 0 {
-		if commandPerms&(1<<kickMembers) != 0 {
+	if userPerms&kickMembers == 0 {
+		if commandPerms&kickMembers != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<banMembers) == 0 {
-		if commandPerms&(1<<banMembers) != 0 {
+	if userPerms&banMembers == 0 {
+		if commandPerms&banMembers != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<administrator) == 0 {
-		if commandPerms&(1<<administrator) != 0 {
+	if userPerms&administrator == 0 {
+		if commandPerms&administrator != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<viewAuditLog) == 0 {
-		if commandPerms&(1<<viewAuditLog) != 0 {
+	if userPerms&viewAuditLog == 0 {
+		if commandPerms&viewAuditLog != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<changeNickname) == 0 {
-		if commandPerms&(1<<changeNickname) != 0 {
-			return false
-		}
-	}
-
-	return true
-}
-
-func checkManagementPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<manageChannels) == 0 {
-		if commandPerms&(1<<manageChannels) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageEmojis) == 0 {
-		if commandPerms&(1<<manageEmojis) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageGuild) == 0 {
-		if commandPerms&(1<<manageGuild) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageMessages) == 0 {
-		if commandPerms&(1<<manageMessages) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageNicknames) == 0 {
-		if commandPerms&(1<<manageNicknames) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageRoles) == 0 {
-		if commandPerms&(1<<manageRoles) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<manageWebhooks) == 0 {
-		if commandPerms&(1<<manageWebhooks) != 0 {
+	if userPerms&changeNickname == 0 {
+		if commandPerms&changeNickname != 0 {
 			return false
 		}
 	}
@@ -186,54 +194,39 @@ func checkManagementPerms(userPerms int, commandPerms int) bool {
 	return true
 }
 
-func checkTextPerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<addReactions) == 0 {
-		if commandPerms&(1<<addReactions) != 0 {
+func checkManagementPerms(userPerms Permission, commandPerms Permission) bool {
+	if userPerms&manageChannels == 0 {
+		if commandPerms&manageChannels != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<readMessages) == 0 {
-		if commandPerms&(1<<readMessages) != 0 {
+	if userPerms&manageEmojis == 0 {
+		if commandPerms&manageEmojis != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<sendMessages) == 0 {
-		if commandPerms&(1<<sendMessages) != 0 {
+	if userPerms&manageGuild == 0 {
+		if commandPerms&manageGuild != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<sendTTSMessages) == 0 {
-		if commandPerms&(1<<sendTTSMessages) != 0 {
+	if userPerms&manageMessages == 0 {
+		if commandPerms&manageMessages != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<manageMessages) == 0 {
-		if commandPerms&(1<<manageMessages) != 0 {
+	if userPerms&manageNicknames == 0 {
+		if commandPerms&manageNicknames != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<embedLinks) == 0 {
-		if commandPerms&(1<<embedLinks) != 0 {
+	if userPerms&manageRoles == 0 {
+		if commandPerms&manageRoles != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<attachFiles) == 0 {
-		if commandPerms&(1<<attachFiles) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<readMessageHistory) == 0 {
-		if commandPerms&(1<<readMessageHistory) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<mentionEveryone) == 0 {
-		if commandPerms&(1<<mentionEveryone) != 0 {
-			return false
-		}
-	}
-	if userPerms&(1<<useExternalEmojis) == 0 {
-		if commandPerms&(1<<useExternalEmojis) != 0 {
+	if userPerms&manageWebhooks == 0 {
+		if commandPerms&manageWebhooks != 0 {
 			return false
 		}
 	}
@@ -241,34 +234,89 @@ func checkTextPerms(userPerms int, commandPerms int) bool {
 	return true
 }
 
-func checkVoicePerms(userPerms int, commandPerms int) bool {
-	if userPerms&(1<<connect) == 0 {
-		if commandPerms&(1<<connect) != 0 {
+func checkTextPerms(userPerms Permission, commandPerms Permission) bool {
+	if userPerms&addReactions == 0 {
+		if commandPerms&addReactions != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<speak) == 0 {
-		if commandPerms&(1<<speak) != 0 {
+	if userPerms&readMessages == 0 {
+		if commandPerms&readMessages != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<muteMembers) == 0 {
-		if commandPerms&(1<<muteMembers) != 0 {
+	if userPerms&sendMessages == 0 {
+		if commandPerms&sendMessages != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<deafenMembers) == 0 {
-		if commandPerms&(1<<deafenMembers) != 0 {
+	if userPerms&sendTTSMessages == 0 {
+		if commandPerms&sendTTSMessages != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<moveMembers) == 0 {
-		if commandPerms&(1<<moveMembers) != 0 {
+	if userPerms&manageMessages == 0 {
+		if commandPerms&manageMessages != 0 {
 			return false
 		}
 	}
-	if userPerms&(1<<useVAD) == 0 {
-		if commandPerms&(1<<useVAD) != 0 {
+	if userPerms&embedLinks == 0 {
+		if commandPerms&embedLinks != 0 {
+			return false
+		}
+	}
+	if userPerms&attachFiles == 0 {
+		if commandPerms&attachFiles != 0 {
+			return false
+		}
+	}
+	if userPerms&readMessageHistory == 0 {
+		if commandPerms&readMessageHistory != 0 {
+			return false
+		}
+	}
+	if userPerms&mentionEveryone == 0 {
+		if commandPerms&mentionEveryone != 0 {
+			return false
+		}
+	}
+	if userPerms&useExternalEmojis == 0 {
+		if commandPerms&useExternalEmojis != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func checkVoicePerms(userPerms Permission, commandPerms Permission) bool {
+	if userPerms&connect == 0 {
+		if commandPerms&connect != 0 {
+			return false
+		}
+	}
+	if userPerms&speak == 0 {
+		if commandPerms&speak != 0 {
+			return false
+		}
+	}
+	if userPerms&muteMembers == 0 {
+		if commandPerms&muteMembers != 0 {
+			return false
+		}
+	}
+	if userPerms&deafenMembers == 0 {
+		if commandPerms&deafenMembers != 0 {
+			return false
+		}
+	}
+	if userPerms&moveMembers == 0 {
+		if commandPerms&moveMembers != 0 {
+			return false
+		}
+	}
+	if userPerms&useVAD == 0 {
+		if commandPerms&useVAD != 0 {
 			return false
 		}
 	}
